@@ -1,2 +1,2 @@
-# AWS-ECS-Jenkins-CI-CD
-AWS, ECS, Jenkins, CI/CD
+# Automated CI/CD Pipeline with Dockerized Microservices on AWS + Jenkins
+
