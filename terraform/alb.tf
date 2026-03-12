@@ -2,8 +2,17 @@ resource "aws_lb" "alb" {
   name               = "ecs-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = [aws_subnet.public_subnet[0].id, aws_subnet.public_subnet[1].id]
+
+  security_groups = [aws_security_group.alb_sg.id]
+
+  subnets = [
+    aws_subnet.public_subnet_1.id,
+    aws_subnet.public_subnet_2.id
+  ]
+
+  tags = {
+    Name = "ecs-alb"
+  }
 }
 
 # Frontend Target Group
