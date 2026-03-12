@@ -50,11 +50,6 @@ resource "aws_ecs_service" "backend_service" {
     assign_public_ip = false
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.backend_tg.arn
-    container_name   = "backend-container"
-    container_port   = 80
-  }
-
+ 
   depends_on = [aws_lb_listener.backend_listener]  # ensure listener exists first
 }
