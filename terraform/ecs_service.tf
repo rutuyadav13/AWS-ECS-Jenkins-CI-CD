@@ -1,47 +1,61 @@
-# Frontend ECS Service
+# ECS Frontend Service
 resource "aws_ecs_service" "frontend_service" {
   name            = "frontend-service"
   cluster         = aws_ecs_cluster.main_cluster.id
+  launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.frontend_task.arn
   desired_count   = 2
-  launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [aws_subnet.private_subnet.id]
+    subnets         = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
     security_groups = [aws_security_group.ecs_sg.id]
     assign_public_ip = false
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.frontend_tg.arn
-    container_name   = "frontend"
+    container_name   = "frontend-container"
     container_port   = 80
   }
 
-  deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200
+  depends_on = [aws_lb_listener.frontend_listener]
 }
 
-# Backend ECS Service
+# ECS Backend Service
+resource "aws_lb_target_group" "backend_tg" {
+  name       = "backend-tg"
+  port       = 80
+  protocol   = "HTTP"
+  vpc_id     = aws_vpc.main_vpc.id
+  target_type = "ip"
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200-399"
+  }
+}
+
 resource "aws_ecs_service" "backend_service" {
   name            = "backend-service"
   cluster         = aws_ecs_cluster.main_cluster.id
+  launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.backend_task.arn
   desired_count   = 2
-  launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = [aws_subnet.private_subnet.id]
+    subnets         = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
     security_groups = [aws_security_group.ecs_sg.id]
     assign_public_ip = false
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.backend_tg.arn
-    container_name   = "backend"
+    container_name   = "backend-container"
     container_port   = 80
   }
 
-  deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200
+  depends_on = [aws_lb_listener.frontend_listener]
 }
