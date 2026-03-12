@@ -41,13 +41,12 @@ resource "aws_lb_target_group" "backend_tg" {
 resource "aws_ecs_service" "backend_service" {
   name            = "backend-service"
   cluster         = aws_ecs_cluster.main_cluster.id
-  launch_type     = "FARGATE"
   task_definition = aws_ecs_task_definition.backend_task.arn
-  desired_count   = 2
-
+  launch_type     = "FARGATE"
+  desired_count   = 1
   network_configuration {
-    subnets         = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
-    security_groups = [aws_security_group.ecs_sg.id]
+    subnets         = [aws_subnet.private_subnet[0].id, aws_subnet.private_subnet[1].id]
+    security_groups = [aws_security_group.backend_sg.id]
     assign_public_ip = false
   }
 
@@ -57,5 +56,5 @@ resource "aws_ecs_service" "backend_service" {
     container_port   = 80
   }
 
-  depends_on = [aws_lb_listener.frontend_listener]
+  depends_on = [aws_lb_listener.backend_listener]  # ensure listener exists first
 }
