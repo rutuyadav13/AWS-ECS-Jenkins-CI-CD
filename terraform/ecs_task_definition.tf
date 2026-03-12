@@ -4,6 +4,7 @@ resource "aws_ecs_task_definition" "frontend_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn  # <-- add this
 
   container_definitions = jsonencode([
     {
@@ -21,15 +22,13 @@ resource "aws_ecs_task_definition" "frontend_task" {
   ])
 }
 
-#Backend Task Definition
-
-
 resource "aws_ecs_task_definition" "backend_task" {
   family                   = "backend-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn  # <-- add this
 
   container_definitions = jsonencode([
     {
