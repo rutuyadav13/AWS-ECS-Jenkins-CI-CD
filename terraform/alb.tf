@@ -5,16 +5,14 @@ resource "aws_lb" "alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
   subnets = [
-              aws_subnet.public_subnet_1.id,
-              aws_subnet.public_subnet_2.id
-            ]
+    aws_subnet.public_subnet_1.id,
+    aws_subnet.public_subnet_2.id
+  ]
 
-  tags = {
-    Name = "ecs-alb"
-  }
+  tags = { Name = "ecs-alb" }
 }
 
-# Target Group for Frontend
+# Target group for Frontend
 resource "aws_lb_target_group" "frontend_tg" {
   name     = "frontend-tg"
   port     = 80
@@ -27,26 +25,11 @@ resource "aws_lb_target_group" "frontend_tg" {
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
+    matcher             = "200-399"
   }
 }
 
-# Target Group for Backend
-resource "aws_lb_target_group" "backend_tg" {
-  name     = "backend-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main_vpc.id
-  target_type = "ip"
-  health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-}
-
-# ALB Listener for Frontend
+# Listener for ALB
 resource "aws_lb_listener" "frontend_listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
